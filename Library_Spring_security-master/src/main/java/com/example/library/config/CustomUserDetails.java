@@ -29,7 +29,7 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> list = new LinkedList<>();
-        list.add(new SimpleGrantedAuthority(role.name())); // ROLE
+        list.add(new SimpleGrantedAuthority(role.name()));
         return list;
     }
 

@@ -25,15 +25,8 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
-    private final UserDetailsService userDetailsService;
 
-    @Override
-    protected  boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        AntPathMatcher pathMatcher = new AntPathMatcher();
-        return Arrays
-                .stream(SpringSecurityConfig.AUTH_WHITELIST)
-                .anyMatch(p -> pathMatcher.match(p, request.getServletPath()));
-    }
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

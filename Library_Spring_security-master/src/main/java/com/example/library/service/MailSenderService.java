@@ -1,7 +1,6 @@
 package com.example.library.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -22,5 +21,4 @@ public class MailSenderService {
         msg.setText(text);
         javaMailSender.send(msg);
     }
-
 }
