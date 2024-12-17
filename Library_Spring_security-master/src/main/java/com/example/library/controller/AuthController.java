@@ -31,7 +31,7 @@ public class AuthController {
     }
 
     @PostMapping("/verify-otp/{otp}")
-    public ResponseEntity<String> otp(@PathVariable Integer otp) {
+    public ResponseEntity<String> otp(@PathVariable String otp) {
         return authService.verifyOtp(otp);
     }
 

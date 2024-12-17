@@ -8,11 +8,10 @@ import org.springframework.http.ResponseEntity;
 public interface AuthService {
     ResponseEntity<ProfileDTO> login(AuthDTO profile);
 
-    ResponseEntity<String> logout(String token);
 
     ResponseEntity<Boolean> registration(RegistrationDTO registrationDTO);
 
     ResponseEntity<String> emailVerification(String jwt);
 
-    ResponseEntity<String> verifyOtp(Integer dto);
+    ResponseEntity<String> verifyOtp(String otp);
 }

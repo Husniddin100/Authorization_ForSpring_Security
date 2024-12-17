@@ -117,38 +117,25 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<String> verifyOtp(Integer otp) {
+    public ResponseEntity<String> verifyOtp(String otp) {
         String username = SpringSecurityUtil.getCurrentUser().getUsername();
-        ProfileRole role = SpringSecurityUtil.getCurrentUser().getRole();
-        String email = SpringSecurityUtil.getCurrentUser().getEmail();
 
-
-        String storedOtp = otpStorage.get(otp.toString());
+        String storedOtp = otpStorage.get(otp);
         if (storedOtp == null) {
-            throw new AppBadException("OTP expired or not generated");
+            throw new AppBadException("Invalid OTP or OTP not generated.");
         }
 
         if (storedOtp.equals(username)) {
-            String jwt = JWTUtil.encode(email, role);
-            return ResponseEntity.ok("USERNAME: "+username+" " +
-                    "STATUS: login successfully "+"YOUR JWT: "
-                    +jwt);
+            otpStorage.remove(otp);
+            return ResponseEntity.ok("USERNAME: " + username + " " + "STATUS: login successfully ");
         } else {
-            throw new AppBadException("Invalid OTP");
+            throw new AppBadException("invalid user");
         }
     }
-
 
     public String otp(String username) {
         String otp = String.valueOf(new Random().nextInt(900000) + 100000);
         otpStorage.put(otp, username);
         return otp;
     }
-
-    @Override
-    public ResponseEntity<String> logout(String token) {
-        return null;
-    }
-
-
 }
