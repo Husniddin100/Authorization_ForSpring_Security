@@ -3,7 +3,6 @@ package com.example.library.entity;
 import com.example.library.enums.ProfileRole;
 import com.example.library.enums.ProfileStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 

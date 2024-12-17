@@ -26,6 +26,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         Profile profile = optional.get();
         return new CustomUserDetails(profile.getId(), profile.getEmail(),
-                profile.getPassword(), profile.getStatus(), profile.getRole());
+                profile.getPassword(), profile.getStatus(), profile.getRole(),profile.getUsername());
     }
 }

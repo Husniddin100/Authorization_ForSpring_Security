@@ -3,6 +3,7 @@ package com.example.library.config;
 
 import com.example.library.enums.ProfileRole;
 import com.example.library.enums.ProfileStatus;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,18 +13,24 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
+    @Getter
     private String id;
+    @Getter
     private String email;
-    private String password;
-    private ProfileStatus status;
+    @Getter
+    private String username;
+    private final String password;
+    private final ProfileStatus status;
+    @Getter
     private ProfileRole role;
 
-    public CustomUserDetails(String id, String email, String password, ProfileStatus status, ProfileRole role) {
+    public CustomUserDetails(String id, String email, String password, ProfileStatus status, ProfileRole role, String username) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.status = status;
         this.role = role;
+        this.username = username;
     }
 
     @Override
@@ -38,10 +45,6 @@ public class CustomUserDetails implements UserDetails {
         return password;
     }
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
 
     @Override
     public boolean isAccountNonExpired() {
@@ -63,11 +66,4 @@ public class CustomUserDetails implements UserDetails {
         return status.equals(ProfileStatus.ACTIVE);
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public ProfileRole getRole() {
-        return role;
-    }
 }

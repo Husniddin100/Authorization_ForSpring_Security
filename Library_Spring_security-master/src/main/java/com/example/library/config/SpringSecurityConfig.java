@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @RequiredArgsConstructor
 @Configuration
 @EnableMethodSecurity
@@ -21,11 +22,6 @@ public class SpringSecurityConfig {
     private final UserDetailsService userDetailsService;
 
     private final JwtTokenFilter jwtTokenFilter;
-
-    public static final String[] AUTH_WHITELIST = {
-
-    };
-
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -39,18 +35,16 @@ public class SpringSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
             authorizationManagerRequestMatcherRegistry
-                    .requestMatchers(AUTH_WHITELIST).permitAll()
                     .requestMatchers("/auth/registration").permitAll()
                     .requestMatchers("/auth/verification/email/*").permitAll()
                     .requestMatchers("auth/login").permitAll()
-                    .requestMatchers("auth/verify/**").permitAll()
+                    .requestMatchers("auth/verify-otp/**").permitAll()
                     .anyRequest()
                     .authenticated();
         });
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(AbstractHttpConfigurer::disable);
-
         return http.build();
     }
 

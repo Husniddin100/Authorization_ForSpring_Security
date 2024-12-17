@@ -1,24 +1,27 @@
 package com.example.library.service.impl;
 
-import com.example.library.dto.AuthDTO;
-import com.example.library.dto.JwtDTO;
-import com.example.library.dto.ProfileDTO;
-import com.example.library.dto.RegistrationDTO;
+import com.example.library.dto.*;
 import com.example.library.entity.Profile;
+import com.example.library.entity.TelegramUser;
 import com.example.library.enums.ProfileRole;
 import com.example.library.enums.ProfileStatus;
 import com.example.library.exp.AppBadException;
 import com.example.library.repository.ProfileRepository;
+import com.example.library.repository.TelegramUserRepository;
 import com.example.library.service.AuthService;
 import com.example.library.service.MailSenderService;
+import com.example.library.service.TelegramService;
 import com.example.library.util.JWTUtil;
 import com.example.library.util.MDUtil;
+import com.example.library.util.SpringSecurityUtil;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -29,6 +32,12 @@ public class AuthServiceImpl implements AuthService {
     private final MailSenderService mailSenderService;
 
     private final ProfileRepository profileRepository;
+
+    private final TelegramUserRepository tgRepository;
+
+    private final TelegramService tgService;
+
+    private final Map<String, String> otpStorage = new HashMap<>();
 
 
     @Override
@@ -82,30 +91,60 @@ public class AuthServiceImpl implements AuthService {
 
         if (profile.getUsername() != null && !profile.getUsername().isEmpty()) {
             optional = profileRepository.findByUsernameAndPassword(profile.getUsername(), MDUtil.encode(profile.getPassword()));
-        } else if (profile.getEmail() != null && !profile.getEmail().isEmpty()) {
-            optional = profileRepository.findByEmailAndPassword(profile.getEmail(), MDUtil.encode(profile.getPassword()));
         } else {
             throw new AppBadException("Username or email is required");
         }
 
         Profile entity = optional.orElseThrow(() -> new AppBadException("email or username or password wrong"));
 
+        Optional<TelegramUser> tgoptional = tgRepository.findByUsername(profile.getUsername());
 
-        ProfileDTO dto = new ProfileDTO();
-
-        if (entity.getStatus().equals(ProfileStatus.BLOCKED)) {
-            throw new AppBadException("account blocked");
-        } else if (entity.getStatus().equals(ProfileStatus.REGISTRATION)) {
-            throw new AppBadException("account registration not finished");
+        if (tgoptional.isEmpty()) {
+            throw new AppBadException("user not connect telegram bot");
         }
 
+        String chatId = tgService.getChatId(tgoptional.get().getUsername());
+        if (chatId != null) {
+            tgService.sendMessage(chatId, "Your OTP is: " + otp(profile.getUsername()));
+        }
+        ProfileDTO dto = new ProfileDTO();
+        dto.setUsername(entity.getUsername());
         dto.setName(entity.getName());
         dto.setSurname(entity.getSurname());
-        dto.setRole(entity.getRole());
         dto.setEmail(entity.getEmail());
         dto.setJwt(JWTUtil.encode(entity.getEmail(), entity.getRole()));
         return ResponseEntity.ok(dto);
     }
+
+    @Override
+    public ResponseEntity<String> verifyOtp(Integer otp) {
+        String username = SpringSecurityUtil.getCurrentUser().getUsername();
+        ProfileRole role = SpringSecurityUtil.getCurrentUser().getRole();
+        String email = SpringSecurityUtil.getCurrentUser().getEmail();
+
+
+        String storedOtp = otpStorage.get(otp.toString());
+        if (storedOtp == null) {
+            throw new AppBadException("OTP expired or not generated");
+        }
+
+        if (storedOtp.equals(username)) {
+            String jwt = JWTUtil.encode(email, role);
+            return ResponseEntity.ok("USERNAME: "+username+" " +
+                    "STATUS: login successfully "+"YOUR JWT: "
+                    +jwt);
+        } else {
+            throw new AppBadException("Invalid OTP");
+        }
+    }
+
+
+    public String otp(String username) {
+        String otp = String.valueOf(new Random().nextInt(900000) + 100000);
+        otpStorage.put(otp, username);
+        return otp;
+    }
+
     @Override
     public ResponseEntity<String> logout(String token) {
         return null;

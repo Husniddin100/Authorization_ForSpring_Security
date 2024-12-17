@@ -1,8 +1,8 @@
 package com.example.library.service;
 
 import com.example.library.dto.AuthDTO;
-import com.example.library.dto.RegistrationDTO;
 import com.example.library.dto.ProfileDTO;
+import com.example.library.dto.RegistrationDTO;
 import org.springframework.http.ResponseEntity;
 
 public interface AuthService {
@@ -13,4 +13,6 @@ public interface AuthService {
     ResponseEntity<Boolean> registration(RegistrationDTO registrationDTO);
 
     ResponseEntity<String> emailVerification(String jwt);
+
+    ResponseEntity<String> verifyOtp(Integer dto);
 }

@@ -15,6 +15,10 @@ POST localhost:8081/auth/login
 Content-Type: application/json
 
 {
-  "email": "kontakt20030506@gmail.com",
+  "username": "gg_skins",
   "password": "1234"
 }
+
+#### verify otp
+POST localhost:8081/auth/verify-otp/783660
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3MzQzNjQyMzUsImVtYWlsIjoia29udGFrdDIwMDMwNTA2QGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE3MzQ0NTA2MzUsImlzcyI6IkxpYnJhcnkifQ.Ov88U49I4mVX_IQmSIDZnyVSjIFD5yG9ie7ivkxNILJDCY6NSAgOz0Xvokz7IKfSSZQEo4v0F_z5h2RUAGNGfQ

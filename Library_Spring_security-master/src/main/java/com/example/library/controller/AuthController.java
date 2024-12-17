@@ -30,4 +30,10 @@ public class AuthController {
         return authService.emailVerification(jwt);
     }
 
+    @PostMapping("/verify-otp/{otp}")
+    public ResponseEntity<String> otp(@PathVariable Integer otp) {
+        return authService.verifyOtp(otp);
+    }
+
+
 }
