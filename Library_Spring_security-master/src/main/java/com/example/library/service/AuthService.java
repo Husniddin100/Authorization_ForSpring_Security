@@ -6,8 +6,8 @@ import com.example.library.dto.RegistrationDTO;
 import org.springframework.http.ResponseEntity;
 
 public interface AuthService {
-    ResponseEntity<ProfileDTO> login(AuthDTO profile);
 
+    ResponseEntity<ProfileDTO> login(AuthDTO profile);
 
     ResponseEntity<Boolean> registration(RegistrationDTO registrationDTO);
 

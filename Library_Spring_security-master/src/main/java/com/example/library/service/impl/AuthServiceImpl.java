@@ -85,6 +85,7 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
+
     @Override
     public ResponseEntity<ProfileDTO> login(AuthDTO profile) {
         Optional<Profile> optional;
@@ -101,6 +102,9 @@ public class AuthServiceImpl implements AuthService {
 
         if (tgoptional.isEmpty()) {
             throw new AppBadException("user not connect telegram bot");
+        }
+        if (entity.getStatus().equals(ProfileStatus.REGISTRATION)) {
+            throw new AppBadException("account registration not finish");
         }
 
         String chatId = tgService.getChatId(tgoptional.get().getUsername());
@@ -126,8 +130,10 @@ public class AuthServiceImpl implements AuthService {
         }
 
         if (storedOtp.equals(username)) {
+            String chatId = tgService.getChatId(username);
+            tgService.sendMessage(chatId, " login successfully");
             otpStorage.remove(otp);
-            return ResponseEntity.ok("USERNAME: " + username + " " + "STATUS: login successfully ");
+            return ResponseEntity.ok(" login successfully ");
         } else {
             throw new AppBadException("invalid user");
         }

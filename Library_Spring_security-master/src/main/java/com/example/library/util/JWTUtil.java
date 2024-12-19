@@ -48,7 +48,7 @@ public class JWTUtil {
     }
 
     public static JwtDTO decodeForSpringSecurity(String token) {
-        SignatureAlgorithm sa = SignatureAlgorithm.ES256;
+        SignatureAlgorithm sa = SignatureAlgorithm.HS512;
         SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), sa.getJcaName());
         JwtParser jwtParser = Jwts.parser()
                 .verifyWith(secretKeySpec)

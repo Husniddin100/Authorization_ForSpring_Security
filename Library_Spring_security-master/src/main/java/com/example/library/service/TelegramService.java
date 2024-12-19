@@ -17,7 +17,6 @@ import java.util.Optional;
 @Service
 public class TelegramService extends TelegramLongPollingBot {
 
-    private final TelegramUserRepository user;
     private final TelegramUserRepository repo;
 
     @Override
@@ -26,9 +25,10 @@ public class TelegramService extends TelegramLongPollingBot {
             String chatId = String.valueOf(update.getMessage().getChatId());
             String username = update.getMessage().getFrom().getUserName();
 
-            if (username != null) {
+            if (username == null || username.isEmpty()) {
+                sendMessage(chatId, "Please set up a username on your Telegram account!");
+            } else {
                 Optional<TelegramUser> userOptional = repo.findByUsername(username);
-
                 if (userOptional.isPresent()) {
                     TelegramUser user = userOptional.get();
                     if (!chatId.equals(user.getChatId())) {
@@ -41,7 +41,6 @@ public class TelegramService extends TelegramLongPollingBot {
                     newUser.setUsername(username);
                     repo.save(newUser);
                 }
-
                 sendMessage(chatId, "You are now connected to the authentication system.");
             }
         }
@@ -51,7 +50,6 @@ public class TelegramService extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(text);
-
         try {
             execute(message);
         } catch (TelegramApiException e) {

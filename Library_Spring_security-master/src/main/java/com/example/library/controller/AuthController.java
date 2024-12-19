@@ -5,7 +5,6 @@ import com.example.library.dto.ProfileDTO;
 import com.example.library.dto.RegistrationDTO;
 import com.example.library.service.AuthService;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +33,5 @@ public class AuthController {
     public ResponseEntity<String> otp(@PathVariable String otp) {
         return authService.verifyOtp(otp);
     }
-
 
 }

@@ -38,7 +38,6 @@ public class SpringSecurityConfig {
                     .requestMatchers("/auth/registration").permitAll()
                     .requestMatchers("/auth/verification/email/*").permitAll()
                     .requestMatchers("auth/login").permitAll()
-                    .requestMatchers("auth/verify-otp/**").permitAll()
                     .anyRequest()
                     .authenticated();
         });
