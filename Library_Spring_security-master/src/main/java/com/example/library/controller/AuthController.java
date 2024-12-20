@@ -16,22 +16,22 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ProfileDTO> login(@RequestBody AuthDTO authDTO) {
-        return authService.login(authDTO);
+        return ResponseEntity.ok(authService.login(authDTO));
     }
 
     @PostMapping("/registration")
     public ResponseEntity<Boolean> registration(@RequestBody RegistrationDTO dto) {
-        return authService.registration(dto);
+        return ResponseEntity.ok(authService.registration(dto));
     }
 
     @GetMapping("/verification/email/{jwt}")
     public ResponseEntity<String> emailVerification(@PathVariable("jwt") String jwt) {
-        return authService.emailVerification(jwt);
+        return ResponseEntity.ok(authService.emailVerification(jwt));
     }
 
     @PostMapping("/verify-otp/{otp}")
     public ResponseEntity<String> otp(@PathVariable String otp) {
-        return authService.verifyOtp(otp);
+        return ResponseEntity.ok(authService.verifyOtp(otp));
     }
 
 }

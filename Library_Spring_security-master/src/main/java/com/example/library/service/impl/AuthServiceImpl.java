@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public ResponseEntity<Boolean> registration(RegistrationDTO dto) {
+    public Boolean registration(RegistrationDTO dto) {
         Optional<Profile> optional = profileRepository.findByEmail(dto.getEmail());
         if (optional.isPresent()) {
             if (optional.get().getStatus().equals(ProfileStatus.REGISTRATION)) {
@@ -64,10 +64,10 @@ public class AuthServiceImpl implements AuthService {
         String text = "Hello. \n To complete registration please link to the following link\n"
                 + "http://localhost:8081/auth/verification/email/" + jwt;
         mailSenderService.sendEmail(dto.getEmail(), "Complete registration", text);
-        return ResponseEntity.ok(true);
+        return true;
     }
 
-    public ResponseEntity<String> emailVerification(String jwt) {
+    public String emailVerification(String jwt) {
         try {
             JwtDTO jwtDTO = JWTUtil.decodeForSpringSecurity(jwt);
             Optional<Profile> optional = profileRepository.findByEmail(jwtDTO.getEmail());
@@ -87,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public ResponseEntity<ProfileDTO> login(AuthDTO profile) {
+    public ProfileDTO login(AuthDTO profile) {
         Optional<Profile> optional;
 
         if (profile.getUsername() != null && !profile.getUsername().isEmpty()) {
@@ -117,11 +117,11 @@ public class AuthServiceImpl implements AuthService {
         dto.setSurname(entity.getSurname());
         dto.setEmail(entity.getEmail());
         dto.setJwt(JWTUtil.encode(entity.getEmail(), entity.getRole()));
-        return ResponseEntity.ok(dto);
+        return dto;
     }
 
     @Override
-    public ResponseEntity<String> verifyOtp(String otp) {
+    public String verifyOtp(String otp) {
         String username = SpringSecurityUtil.getCurrentUser().getUsername();
 
         String storedOtp = otpStorage.get(otp);
@@ -133,7 +133,7 @@ public class AuthServiceImpl implements AuthService {
             String chatId = tgService.getChatId(username);
             tgService.sendMessage(chatId, " login successfully");
             otpStorage.remove(otp);
-            return ResponseEntity.ok(" login successfully ");
+            return (" login successfully ");
         } else {
             throw new AppBadException("invalid user");
         }
