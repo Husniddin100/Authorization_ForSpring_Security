@@ -16,7 +16,6 @@ import com.example.library.util.MDUtil;
 import com.example.library.util.SpringSecurityUtil;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -37,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final TelegramService tgService;
 
-    private final Map<String, String> otpStorage = new HashMap<>();
+    private final Map<String, OtpDetailsDTO> otpStorage = new HashMap<>();
 
 
     @Override
@@ -50,16 +49,8 @@ public class AuthServiceImpl implements AuthService {
                 throw new AppBadException("email exists");
             }
         }
-        Profile entity = new Profile();
-        entity.setName(dto.getName());
-        entity.setSurname(dto.getSurname());
-        entity.setUsername(dto.getUsername());
-        entity.setEmail(dto.getEmail());
-        entity.setPassword(MDUtil.encode(dto.getPassword()));
-        entity.setStatus(ProfileStatus.REGISTRATION);
-        entity.setRole(ProfileRole.ROLE_USER);
-        entity.setCreatedDate(LocalDateTime.now());
-        profileRepository.save(entity);
+        Profile entity = toEntity(dto);
+
         String jwt = JWTUtil.encode(entity.getEmail(), entity.getRole());
         String text = "Hello. \n To complete registration please link to the following link\n"
                 + "http://localhost:8081/auth/verification/email/" + jwt;
@@ -124,12 +115,19 @@ public class AuthServiceImpl implements AuthService {
     public String verifyOtp(String otp) {
         String username = SpringSecurityUtil.getCurrentUser().getUsername();
 
-        String storedOtp = otpStorage.get(otp);
-        if (storedOtp == null) {
+        OtpDetailsDTO detailsOtp = otpStorage.get(otp);
+
+        if (detailsOtp == null) {
             throw new AppBadException("Invalid OTP or OTP not generated.");
         }
+        if (detailsOtp.getExpireTime().isBefore(LocalDateTime.now())) {
+            String chatId = tgService.getChatId(username);
+            otpStorage.remove(otp);
+            tgService.sendMessage(chatId, "otp expired");
+            throw new AppBadException("otp expired");
+        }
 
-        if (storedOtp.equals(username)) {
+        if (username.equals(detailsOtp.getUsername())) {
             String chatId = tgService.getChatId(username);
             tgService.sendMessage(chatId, " login successfully");
             otpStorage.remove(otp);
@@ -141,7 +139,22 @@ public class AuthServiceImpl implements AuthService {
 
     public String otp(String username) {
         String otp = String.valueOf(new Random().nextInt(900000) + 100000);
-        otpStorage.put(otp, username);
+        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(2);
+        otpStorage.put(otp, new OtpDetailsDTO(username, expirationTime));
         return otp;
+    }
+
+    public Profile toEntity(RegistrationDTO dto) {
+        Profile entity = new Profile();
+        entity.setName(dto.getName());
+        entity.setSurname(dto.getSurname());
+        entity.setUsername(dto.getUsername());
+        entity.setEmail(dto.getEmail());
+        entity.setPassword(MDUtil.encode(dto.getPassword()));
+        entity.setStatus(ProfileStatus.REGISTRATION);
+        entity.setRole(ProfileRole.ROLE_USER);
+        entity.setCreatedDate(LocalDateTime.now());
+        profileRepository.save(entity);
+        return entity;
     }
 }
