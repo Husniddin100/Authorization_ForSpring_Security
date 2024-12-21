@@ -14,7 +14,7 @@ import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
     @Getter
-    private String id;
+    private Long id;
     @Getter
     private String email;
     @Getter
@@ -24,7 +24,7 @@ public class CustomUserDetails implements UserDetails {
     @Getter
     private ProfileRole role;
 
-    public CustomUserDetails(String id, String email, String password, ProfileStatus status, ProfileRole role, String username) {
+    public CustomUserDetails(Long id, String email, String password, ProfileStatus status, ProfileRole role, String username) {
         this.id = id;
         this.email = email;
         this.password = password;

@@ -10,12 +10,12 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface ProfileRepository extends CrudRepository<Profile,String> {
+public interface ProfileRepository extends CrudRepository<Profile,Long> {
 
     @Modifying
     @Transactional
     @Query("update Profile set status=?2 where id=?1")
-    void updateStatus(String id, ProfileStatus profileStatus);
+    void updateStatus(Long id, ProfileStatus profileStatus);
 
     Optional<Profile> findByEmail(String email);
 

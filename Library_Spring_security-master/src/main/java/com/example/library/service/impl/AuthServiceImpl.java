@@ -15,6 +15,7 @@ import com.example.library.util.JWTUtil;
 import com.example.library.util.MDUtil;
 import com.example.library.util.SpringSecurityUtil;
 import io.jsonwebtoken.JwtException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -63,15 +64,15 @@ public class AuthServiceImpl implements AuthService {
             JwtDTO jwtDTO = JWTUtil.decodeForSpringSecurity(jwt);
             Optional<Profile> optional = profileRepository.findByEmail(jwtDTO.getEmail());
             if (optional.isEmpty()) {
-                throw new AppBadException("account.not.found");
+                throw new AppBadException("account not found");
             }
             Profile entity = optional.get();
             if (!entity.getStatus().equals(ProfileStatus.REGISTRATION)) {
-                throw new AppBadException("profile.in.wrong.status");
+                throw new AppBadException("profile in wrong status");
             }
             profileRepository.updateStatus(entity.getId(), ProfileStatus.ACTIVE);
         } catch (JwtException e) {
-            throw new AppBadException("please.try.again");
+            throw new AppBadException("please try again");
         }
         return null;
     }
@@ -114,6 +115,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String verifyOtp(String otp) {
         String username = SpringSecurityUtil.getCurrentUser().getUsername();
+        String email = SpringSecurityUtil.getCurrentUser().getEmail();
+        ProfileRole role = SpringSecurityUtil.getCurrentUser().getRole();
 
         OtpDetailsDTO detailsOtp = otpStorage.get(otp);
 
@@ -129,9 +132,10 @@ public class AuthServiceImpl implements AuthService {
 
         if (username.equals(detailsOtp.getUsername())) {
             String chatId = tgService.getChatId(username);
+            String jwt = JWTUtil.encode(email, role);
             tgService.sendMessage(chatId, " login successfully");
             otpStorage.remove(otp);
-            return (" login successfully ");
+            return " login successfully " + jwt;
         } else {
             throw new AppBadException("invalid user");
         }

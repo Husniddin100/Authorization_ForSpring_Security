@@ -4,7 +4,6 @@ import com.example.library.enums.ProfileRole;
 import com.example.library.enums.ProfileStatus;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 
@@ -13,9 +12,8 @@ import java.time.LocalDateTime;
 @Table(name = "profile")
 public class Profile {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "name")
     private String name;
