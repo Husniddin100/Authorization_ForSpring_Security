@@ -29,6 +29,7 @@ public class Profile {
 
     @Column(name = "password")
     private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "profile_status")
     private ProfileStatus status;

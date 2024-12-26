@@ -25,7 +25,7 @@ public class TelegramService extends TelegramLongPollingBot {
             String chatId = String.valueOf(update.getMessage().getChatId());
             String username = update.getMessage().getFrom().getUserName();
 
-            if (username == null || username.isEmpty()) {
+            if (username == null) {
                 sendMessage(chatId, "Please set up a username on your Telegram account!");
             } else {
                 Optional<TelegramUser> userOptional = repo.findByUsername(username);
@@ -65,16 +65,15 @@ public class TelegramService extends TelegramLongPollingBot {
         return optional.get().getChatId();
     }
 
-    public
 
     @Override
-    String getBotUsername() {
+    public String getBotUsername() {
         return "@authorization_test1_bot";
     }
 
     @Override
     public String getBotToken() {
-        return "";
+        return "8092240171:AAHts6ur2e82hYDRz2E0DGh4YQBxoh8Hprs";
     }
 
 }
